@@ -1,0 +1,57 @@
+# Example GitHub Actions workflow for validating ai_project_index
+# Copy this to your project's .github/workflows/ directory
+
+name: Validate AI Project Index
+
+on:
+  push:
+    paths:
+      - 'ai_project_index/**'
+  pull_request:
+    paths:
+      - 'ai_project_index/**'
+
+jobs:
+  validate:
+    name: Validate Index Files
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Download validation script
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/keitheis/ai_project_index/main/validate.py -o validate.py
+          chmod +x validate.py
+
+      - name: Install dependencies
+        run: pip install tomli
+
+      - name: Run validation
+        run: ./validate.py --json
+
+      - name: Check for errors and warnings
+        run: |
+          result=$(./validate.py --json)
+          echo "$result" | jq '.'
+
+          # Fail if there are any errors
+          errors=$(echo "$result" | jq '.errors | length')
+          if [ "$errors" -gt 0 ]; then
+            echo "❌ Validation failed with $errors error(s)"
+            exit 1
+          fi
+
+          # Optional: warn about warnings but don't fail
+          warnings=$(echo "$result" | jq '.warnings | length')
+          if [ "$warnings" -gt 0 ]; then
+            echo "⚠️  Found $warnings warning(s)"
+          fi
+
+          echo "✅ Validation passed!"

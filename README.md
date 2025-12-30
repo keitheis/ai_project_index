@@ -14,8 +14,9 @@ A fast handy framework for saving AI tokens by project index in structured TOML 
 - [Multiple Root Folders](#multiple-root-folders)
 - [Key Concepts](#key-concepts)
 - [Maintenance](#maintenance)
-- [Troubleshooting](#troubleshooting)
 - [Best Practices](#best-practices)
+- [Validation Tool](#validation-tool)
+- [Troubleshooting](#troubleshooting)
 - [Why TOML?](#why-toml)
 - [Credits](#credits)
 - [License](#license)
@@ -336,6 +337,71 @@ To save future tokens:
 - Review and refine periodically
 - Remove outdated information promptly
 - Keep files concise to save future tokens
+
+## Validation Tool
+
+**ai_project_index** includes a validation tool to ensure your TOML files are correct and up-to-date.
+
+### Quick Validation
+
+```bash
+# Download and run validation
+curl -fsSL https://raw.githubusercontent.com/keitheis/ai_project_index/main/validate.py -o validate.py
+chmod +x validate.py
+python3 validate.py
+```
+
+Or if you cloned the repository:
+```bash
+./validate.py -v
+```
+
+### What It Checks
+
+- ✅ TOML syntax errors
+- ✅ File path existence (entry points, components, modules)
+- ✅ Module cross-references (declared vs actual)
+- ✅ Required fields presence
+- ✅ TODO placeholders detection
+- ✅ Orphaned module files
+
+### Example Output
+
+```bash
+$ ./validate.py -v
+
+ℹ️  INFO:
+  • Validating: ai_project_index/ai_project_index.toml
+  • Found 3 module file(s)
+  • Cross-reference check: 3/3 modules found
+
+============================================================
+✅ VALIDATION PASSED
+   No issues found
+============================================================
+```
+
+### Installation
+
+The validation tool requires Python 3.7+ and `tomli`:
+
+```bash
+pip install tomli
+```
+
+For Python 3.11+, `tomllib` is built-in (no installation needed).
+
+### Usage Options
+
+```bash
+./validate.py              # Validate current project
+./validate.py -v           # Verbose output
+./validate.py -p /path     # Validate specific project
+./validate.py --json       # JSON output for CI/CD
+./validate.py -q           # Quiet mode (errors only)
+```
+
+See [VALIDATION.md](VALIDATION.md) for detailed documentation, CI/CD integration examples, and troubleshooting.
 
 ## Troubleshooting
 

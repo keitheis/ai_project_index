@@ -1,0 +1,5 @@
+# Requirements for ai_project_index validation tool
+# Python 3.7+ required
+
+tomli>=2.0.0; python_version < "3.11"
+# Python 3.11+ includes tomllib in stdlib
