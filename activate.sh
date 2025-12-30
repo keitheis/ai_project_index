@@ -72,7 +72,7 @@ main() {
     # Determine execution mode and target directory
     # Strategy: Check if local templates exist to determine mode
     local USE_REMOTE=false
-    local SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd || echo "")"
+    local SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-}")" 2>/dev/null && pwd || echo "")"
 
     # Check if local templates directory exists
     if [ -n "$SCRIPT_DIR" ] && [ -d "$SCRIPT_DIR/templates" ]; then
