@@ -39,11 +39,16 @@ is_piped() {
     [ ! -t 0 ]
 }
 
-# Prompt for confirmation
+# Prompt for confirmation (read from /dev/tty if piped)
 confirm() {
     local prompt="$1"
     local response
-    read -p "$prompt [y/N]: " response
+    if is_piped; then
+        echo -n "$prompt [y/N]: "
+        read response </dev/tty
+    else
+        read -p "$prompt [y/N]: " response
+    fi
     case "$response" in
         [yY][eE][sS]|[yY]) return 0 ;;
         *) return 1 ;;
@@ -135,7 +140,12 @@ main() {
     echo "  These are the roots of your source code (e.g., src, lib, .)"
     echo "  You can specify multiple folders separated by commas or spaces"
     echo "  Examples: 'src' or 'src,lib' or 'frontend backend'"
-    read -p "  Path(s) (default: .): " ANALYZE_ROOTS_INPUT
+    if is_piped; then
+        echo -n "  Path(s) (default: .): "
+        read ANALYZE_ROOTS_INPUT </dev/tty
+    else
+        read -p "  Path(s) (default: .): " ANALYZE_ROOTS_INPUT
+    fi
     ANALYZE_ROOTS_INPUT="${ANALYZE_ROOTS_INPUT:-.}"
 
     # Parse input: split by comma or space
