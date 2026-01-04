@@ -242,9 +242,13 @@ main() {
     echo ""
     echo "  3. Add to your AI instructions (e.g., CLAUDE.md):"
     echo ""
-    echo -e "${BLUE}     **Important** Read:"
-    echo "       - Project index: ai_project_index/ai_project_index.toml"
-    echo -e "       - Modules: ai_project_index/modules/*.toml${NC}"
+    echo -e "${BLUE}     ## Architecture/Modules/Project Index"
+    echo ""
+    echo "     **Read first:**"
+    echo "     - \`ai_project_index/ai_project_index.toml\` (project overview)"
+    echo "     - Relevant \`ai_project_index/modules/*.toml\` files (module details)"
+    echo ""
+    echo -e "     Use the index to navigate the codebase efficiently.${NC}"
     echo ""
 }
 

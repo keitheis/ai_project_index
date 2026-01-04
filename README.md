@@ -91,10 +91,14 @@ Use the snapshot concept described in INIT.md to organize the codebase by featur
 
 ### 3. Append the instruction to your AI markdown instructions.
 
-```
-**Important** Read:
-  - Project index: `ai_project_index/ai_project_index.toml`
-  - Modules: `ai_project_index/modules/*.toml`
+```markdown
+## Architecture/Modules/Project Index
+
+**Read first:**
+- `ai_project_index/ai_project_index.toml` (project overview)
+- Relevant `ai_project_index/modules/*.toml` files (module details)
+
+Use the index to navigate the codebase efficiently.
 ```
 
 ### 4. Add or ignore `ai_project_index/` (Optional)
@@ -104,7 +108,8 @@ You can choose to commit the generated index files to version control or ignore 
 **Option A: Commit to repository** (Recommended for teams)
 ```bash
 git add ai_project_index/
-git commit -m "Add AI project index"
+git commit -m "Add AI Architecture/Modules/Project Index"
+
 ```
 Benefits: Team members and AI assistants get immediate context about the project structure.
 
