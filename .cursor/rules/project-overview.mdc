@@ -9,5 +9,5 @@ alwaysApply: true
 - `activate.sh` must support both `curl | bash` piped execution and local clone usage — always preserve both code paths.
 - Templates use `{{PLACEHOLDER}}` syntax (double curly braces, UPPER_SNAKE_CASE). Placeholders are substituted via `sed` in `activate.sh`.
 - AI guidance files (`CLAUDE.md`, `AGENTS.md`, `GEMINI.md`) share identical content and must stay in sync when edited.
-- Module TOML files go in `ai_project_index/modules/{module_name}.toml`. The TOML format uses `[meta]`, `[[component]]` arrays, `[dependencies]`, and `[usage]` sections.
+- Module TOML files go in `ai_project_index/modules/{module_name}.toml`. The TOML format uses `[meta]`, `[meta.tech]`, `[boundaries]`, `[gotchas]`, `[change_risk]`, `[[component]]` arrays, `[dependencies]`, and `[usage]` sections.
 - The framework is language-agnostic — component types (`[[model]]`, `[[service]]`, etc.) adapt to the target project.

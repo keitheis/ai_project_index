@@ -7,7 +7,7 @@ set -e  # Exit on error
 set -u  # Exit on undefined variable
 
 # CONSTANTS & CONFIGURATION
-VERSION="1.0.0"
+VERSION="1.1.0"
 GITHUB_RAW_BASE="https://raw.githubusercontent.com/keitheis/ai_project_index/main"
 
 # Colors for output
@@ -32,6 +32,31 @@ print_info() { echo -e "${BLUE}→${NC} $1"; }
 error_exit() {
     print_error "$1"
     exit 1
+}
+
+print_usage() {
+    echo "Usage: activate.sh [OPTIONS] [target_directory]"
+    echo ""
+    echo "Initialize ai_project_index in a project directory."
+    echo ""
+    echo "Options:"
+    echo "  -h, --help      Show this help message and exit"
+    echo "  -v, --version   Show version and exit"
+    echo ""
+    echo "Arguments:"
+    echo "  target_directory  Directory to initialize (default: current directory)"
+    echo ""
+    echo "Examples:"
+    echo "  # Run in current directory"
+    echo "  ./activate.sh"
+    echo ""
+    echo "  # Run in a specific project"
+    echo "  ./activate.sh /path/to/project"
+    echo ""
+    echo "  # Run via curl"
+    echo "  curl -fsSL https://raw.githubusercontent.com/keitheis/ai_project_index/main/activate.sh | bash"
+    echo ""
+    echo "More info: https://github.com/keitheis/ai_project_index"
 }
 
 # Check if running via pipe (curl | bash)
@@ -72,6 +97,18 @@ download_template() {
 # MAIN LOGIC
 
 main() {
+    # Handle flags before printing header
+    case "${1:-}" in
+        -h|--help)
+            print_usage
+            exit 0
+            ;;
+        -v|--version)
+            echo "ai_project_index v$VERSION"
+            exit 0
+            ;;
+    esac
+
     print_header
 
     # Determine execution mode and target directory
@@ -244,21 +281,22 @@ main() {
     echo "  1. Open your AI IDE/CLI"
     echo "  2. Copy this prompt and paste it to AI dialog:"
     echo ""
-    echo -e "${BLUE}     1. Read ai_project_index/INIT.md"
-    echo "     2. Use snapshot concept to analyze this project"
-    echo "     3. Update ai_project_index/ai_project_index.toml and create module files."
-    echo "        Remove unused sections and comments to keep toml files small."
-    echo -e "     4. Delete ai_project_index/INIT.md in the end. ${NC}"
+    echo -e "${BLUE}     1. Read ai_project_index/INIT.md and follow the instructions."
+    echo "     2. Analyze this project and populate ai_project_index.toml"
+    echo "        (especially boundaries, gotchas, and change_risk)."
+    echo "     3. Create module files in ai_project_index/modules/."
+    echo "     4. Remove empty sections to keep TOML files lean."
+    echo -e "     5. Delete ai_project_index/INIT.md when done.${NC}"
     echo ""
-    echo "  3. Add to your AI instructions (e.g., CLAUDE.md):"
+    echo "  3. Add to your AI instructions (CLAUDE.md, .cursorrules, AGENTS.md, etc.):"
     echo ""
-    echo -e "${BLUE}     ## Architecture/Modules/Project Index"
+    echo -e "${BLUE}     ## Architecture / Project Index"
     echo ""
     echo "     **Read first:**"
-    echo "     - \`ai_project_index/ai_project_index.toml\` (project overview)"
-    echo "     - Relevant \`ai_project_index/modules/*.toml\` files (module details)"
+    echo "     - \`ai_project_index/ai_project_index.toml\` (overview, boundaries, gotchas)"
+    echo "     - Relevant \`ai_project_index/modules/*.toml\` (module details)"
     echo ""
-    echo -e "     Use the index to navigate the codebase efficiently.${NC}"
+    echo -e "     Use the index to navigate the codebase. Respect the boundaries.${NC}"
     echo ""
 }
 

@@ -14,7 +14,7 @@ alwaysApply: false
 
 ## ai_project_index.toml
 
-- Sections: `[meta]`, `[structure]`, `[modules]`, `[entry_points]`, `[commands]`, `[dependencies.policy]`, `[dependencies.external]`, `[conventions]`, `[conventions.patterns]`, `[conventions.files]`, `[notes]`.
+- Sections: `[meta]`, `[meta.tech]`, `[structure]`, `[modules]`, `[entry_points]`, `[commands]`, `[boundaries]`, `[dependencies.external]`, `[gotchas]`, `[change_risk]`, `[conventions]`, `[conventions.patterns]`, `[conventions.files]`, `[notes]`.
 - Use TOML comments (`#`) for examples and guidance — users and AI fill in values.
 - `[[component]]` arrays are for inline component definitions; larger projects use separate module files.
 
