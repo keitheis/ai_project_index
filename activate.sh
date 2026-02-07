@@ -240,17 +240,30 @@ main() {
     echo "  📄 $INDEX_DIR/ai_project_index.toml"
     echo "  📄 $INDEX_DIR/INIT.md"
     echo ""
+    
+    # Offer validation
+    if [ -f "$SCRIPT_DIR/validate.sh" ] || command -v validate.sh >/dev/null 2>&1; then
+        echo -e "${YELLOW}Tip:${NC} Run validation after AI analysis:"
+        if [ -f "$SCRIPT_DIR/validate.sh" ]; then
+            echo "  $SCRIPT_DIR/validate.sh $INDEX_DIR"
+        else
+            echo "  validate.sh $INDEX_DIR"
+        fi
+        echo ""
+    fi
+    
     echo -e "${YELLOW}Next steps:${NC}"
     echo "  1. Open your AI IDE/CLI"
     echo "  2. Copy this prompt and paste it to AI dialog:"
     echo ""
     echo -e "${BLUE}     1. Read ai_project_index/INIT.md"
-    echo "     2. Use snapshot concept to analyze this project"
+    echo "     2. Use structured thinking and chain-of-thought to analyze this project"
     echo "     3. Update ai_project_index/ai_project_index.toml and create module files."
+    echo "        Follow the validation checklist in INIT.md."
     echo "        Remove unused sections and comments to keep toml files small."
     echo -e "     4. Delete ai_project_index/INIT.md in the end. ${NC}"
     echo ""
-    echo "  3. Add to your AI instructions (e.g., CLAUDE.md):"
+    echo "  3. Add to your AI instructions (e.g., CLAUDE.md, .cursorrules):"
     echo ""
     echo -e "${BLUE}     ## Architecture/Modules/Project Index"
     echo ""
@@ -258,7 +271,8 @@ main() {
     echo "     - \`ai_project_index/ai_project_index.toml\` (project overview)"
     echo "     - Relevant \`ai_project_index/modules/*.toml\` files (module details)"
     echo ""
-    echo -e "     Use the index to navigate the codebase efficiently.${NC}"
+    echo "     Use the index to navigate the codebase efficiently."
+    echo "     When making changes, update the index to keep it in sync.${NC}"
     echo ""
 }
 

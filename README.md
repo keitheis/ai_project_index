@@ -76,20 +76,48 @@ Open your AI assistant (IDE plugin or CLI) and provide this prompt:
 
 ```
 Read ai_project_index/INIT.md and follow the instructions to:
-1. Analyze this project's structure and modules
-2. Create/update ai_project_index/ai_project_index.toml with project metadata
-3. Create module-specific TOML files in ai_project_index/modules/
+1. Use structured thinking and chain-of-thought reasoning
+2. Analyze this project's structure and modules systematically
+3. Create/update ai_project_index/ai_project_index.toml with project metadata
+4. Create module-specific TOML files in ai_project_index/modules/
+5. Follow the validation checklist in INIT.md
 
 Use the snapshot concept described in INIT.md to organize the codebase by feature/domain.
 ```
 
 **What to expect:**
-- The AI will ask clarifying questions about your project structure
+- The AI will use structured thinking to understand your project
+- It will ask clarifying questions about your project structure if needed
 - It will read files across your codebase to understand the architecture
 - For large projects (>10,000 LOC), this may take several interactions
 - You can review and refine the generated TOML files afterward
 
-### 3. Append the instruction to your AI markdown instructions.
+**Modern AI Features:**
+- Chain-of-thought reasoning for better analysis
+- Structured discovery and documentation phases
+- Validation checklists for quality assurance
+- Token-efficient documentation strategies
+
+### 3. Validate the generated index (Optional but recommended)
+
+After AI analysis, validate the TOML files:
+
+```bash
+# If you cloned the repo locally
+/tmp/ai_project_index/validate.sh ai_project_index
+
+# Or if validate.sh is in your PATH
+validate.sh ai_project_index
+```
+
+This checks:
+- TOML syntax validity
+- Required sections presence
+- Basic structure correctness
+
+### 4. Append the instruction to your AI markdown instructions
+
+Add to your AI assistant's instructions (e.g., `.cursorrules`, `CLAUDE.md`, or IDE settings):
 
 ```markdown
 ## Architecture/Modules/Project Index
@@ -99,9 +127,10 @@ Use the snapshot concept described in INIT.md to organize the codebase by featur
 - Relevant `ai_project_index/modules/*.toml` files (module details)
 
 Use the index to navigate the codebase efficiently.
+When making architectural changes, update the index to keep it in sync.
 ```
 
-### 4. Add or ignore `ai_project_index/` (Optional)
+### 5. Add or ignore `ai_project_index/` (Optional)
 
 You can choose to commit the generated index files to version control or ignore them:
 
@@ -140,8 +169,12 @@ your_project/
 [meta]
 name = "MyProject"
 version = "1.0.0"
+schema_version = "2.0"
+created_at = "2026-02-07T00:00:00Z"
+updated_at = "2026-02-07T00:00:00Z"
 roots = ["src", "lib"]
 description = "A web application with authentication and API"
+complexity = "medium"
 
 [project]
 languages = ["Python", "JavaScript"]
@@ -284,6 +317,7 @@ Focus on:
 - New modules or files added
 - Deleted or moved files
 - Changed dependencies
+- Update updated_at timestamp in ai_project_index.toml
 ```
 
 **Option 2: Full regeneration**
@@ -295,6 +329,15 @@ cp -r ai_project_index ai_project_index.backup
 
 # Ask AI to regenerate (use the Step 2 prompt from Quick Start)
 ```
+
+**Option 3: Validation after updates**
+
+Always validate after updates:
+```bash
+validate.sh ai_project_index
+```
+
+This ensures TOML syntax is correct and structure is valid.
 
 ### When to Update
 
@@ -324,23 +367,62 @@ To save future tokens:
 - Begin with high-level module organization
 - Add detail gradually as needed
 - Don't try to document everything at once
+- Use structured thinking: Discovery → Architecture → Documentation → Validation
 
 ### Be Consistent
 - Use similar TOML structure across modules
 - Maintain consistent naming conventions
 - Keep descriptions at the same level of abstraction
+- Follow the schema version (currently 2.0)
 
 ### Focus on Architecture
 - Document boundaries between modules
 - Highlight public APIs and interfaces
 - Skip private implementation details
 - Think in layers: Core → Modules → Features
+- Use chain-of-thought reasoning when documenting
 
 ### Treat as Living Documentation
 - Update alongside code changes (see [Maintenance](#maintenance))
 - Review and refine periodically
 - Remove outdated information promptly
 - Keep files concise to save future tokens
+- Update `updated_at` timestamp when making changes
+- Validate after updates using `validate.sh`
+
+### Token Efficiency
+- Document only what helps AI navigate faster
+- If reading TOML saves reading 2+ source files → Include it
+- If it's faster to read source → Skip it
+- Focus on stable architectural knowledge, not implementation details
+
+### AI Integration
+- Add index instructions to your AI assistant's context
+- Use the index proactively in AI conversations
+- Reference specific modules when discussing features
+- Update index when AI suggests architectural changes
+
+## Validation
+
+After generating or updating your index, validate it:
+
+```bash
+# Using the validation script
+validate.sh ai_project_index
+
+# Or if you have Python 3.11+ with tomllib
+python3 -c "import tomllib; tomllib.load(open('ai_project_index/ai_project_index.toml', 'rb'))"
+```
+
+The validation script checks:
+- ✅ TOML syntax validity
+- ✅ Required `[meta]` sections
+- ✅ Basic structure correctness
+- ✅ File references
+
+**Note**: For full validation, install a TOML parser:
+- Python 3.11+: Built-in `tomllib`
+- Python 3.10 and below: `pip install tomli`
 
 ## Troubleshooting
 
@@ -411,12 +493,50 @@ bash /tmp/ai_project_index/activate.sh
 
 3. Manually edit `ai_project_index.toml` to fix paths
 
+4. Run validation to check for issues:
+   ```bash
+   validate.sh ai_project_index
+   ```
+
+### TOML validation fails
+
+**Problem**: Validation script reports syntax errors.
+
+**Solutions**:
+1. Check TOML syntax using an online validator or Python:
+   ```bash
+   python3 -c "import tomllib; tomllib.load(open('ai_project_index/ai_project_index.toml', 'rb'))"
+   ```
+
+2. Common issues:
+   - Missing quotes around strings with special characters
+   - Incorrect array syntax
+   - Missing closing brackets
+   - Invalid date format in timestamps (use ISO 8601)
+
+3. Fix syntax errors and re-validate
+
 ## Why TOML?
 
 - **Human-readable** — Easy to read and write
 - **Structured** — Supports nested sections and arrays
 - **Comments** — Include explanatory notes
 - **Universal** — Parsers available in all languages
+- **AI-friendly** — Clear structure helps AI understand relationships
+- **Version-controlled** — Diff-friendly format for tracking changes
+
+## Schema Version
+
+Current schema version: **2.0**
+
+Schema 2.0 includes:
+- Version tracking (`schema_version`, `version`)
+- Timestamps (`created_at`, `updated_at`)
+- Complexity indicators (`complexity`)
+- Enhanced AI context hints (`[ai_context]`)
+- Additional command types (`type_check`, `generate`)
+
+When updating from older schemas, ensure compatibility or migrate accordingly.
 
 ## Credits
 
