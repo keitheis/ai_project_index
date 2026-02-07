@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TOML](https://img.shields.io/badge/format-TOML-blue.svg)](https://toml.io)
 
-A fast handy framework for saving AI tokens by project index in structured TOML files.
+A fast handy framework for saving AI tokens and routing context efficiently using structured TOML project indices.
 
 ## Table of Contents
 
@@ -13,6 +13,7 @@ A fast handy framework for saving AI tokens by project index in structured TOML 
 - [Example Output](#example-output)
 - [Multiple Root Folders](#multiple-root-folders)
 - [Key Concepts](#key-concepts)
+- [Integration with AI Tools](#integration-with-ai-tools)
 - [Maintenance](#maintenance)
 - [Troubleshooting](#troubleshooting)
 - [Best Practices](#best-practices)
@@ -23,14 +24,17 @@ A fast handy framework for saving AI tokens by project index in structured TOML 
 ## The Problem
 
 AI coding assistants struggle with large codebases:
-- Single snapshot files consume too many context tokens
-- AI needs to read many files to understand architecture
-- No standardized way to document codebase structure for AI
+- **Token waste** — AI reads many files to understand architecture, burning tokens on every interaction
+- **Context pollution** — Loading irrelevant files reduces AI reasoning quality
+- **No routing** — AI has no way to know *which* files are relevant to a given task
+- **No guardrails** — AI doesn't know architectural boundaries it should not cross
 
 ## The Solution
 
 **ai_project_index** provides:
 - **Split snapshots** — Multiple focused TOML files instead of one large file
+- **Context routing** — A `[context_loading]` table that maps task types to relevant files
+- **Architectural boundaries** — A `[boundaries]` section documenting invariants AI must respect
 - **Module-based organization** — Organized by feature/domain
 - **Cross-references** — Track dependencies and usage for safe refactoring
 - **Language-agnostic** — Works with any programming language
@@ -79,6 +83,8 @@ Read ai_project_index/INIT.md and follow the instructions to:
 1. Analyze this project's structure and modules
 2. Create/update ai_project_index/ai_project_index.toml with project metadata
 3. Create module-specific TOML files in ai_project_index/modules/
+4. Fill in the context_loading and boundaries sections
+5. Delete ai_project_index/INIT.md when done
 
 Use the snapshot concept described in INIT.md to organize the codebase by feature/domain.
 ```
@@ -91,14 +97,17 @@ Use the snapshot concept described in INIT.md to organize the codebase by featur
 
 ### 3. Append the instruction to your AI markdown instructions.
 
+Add this to your `CLAUDE.md`, `AGENTS.md`, `.github/copilot-instructions.md`, or equivalent:
+
 ```markdown
 ## Architecture/Modules/Project Index
 
 **Read first:**
-- `ai_project_index/ai_project_index.toml` (project overview)
+- `ai_project_index/ai_project_index.toml` (project overview and context routing)
 - Relevant `ai_project_index/modules/*.toml` files (module details)
 
-Use the index to navigate the codebase efficiently.
+Use the `[context_loading]` section to determine which files to read for the current task.
+Respect the `[boundaries]` section — do not violate architectural invariants.
 ```
 
 ### 4. Add or ignore `ai_project_index/` (Optional)
@@ -127,7 +136,6 @@ After setup, your project will have a structure like this:
 your_project/
 ├── ai_project_index/
 │   ├── ai_project_index.toml          # Main project index
-│   ├── INIT.md                        # Setup instructions for AI
 │   └── modules/
 │       ├── auth.toml                  # Authentication module
 │       ├── api.toml                   # API layer
@@ -142,23 +150,68 @@ name = "MyProject"
 version = "1.0.0"
 roots = ["src", "lib"]
 description = "A web application with authentication and API"
+language = "Python"
+framework = "FastAPI"
+architecture = "Clean Architecture"
 
-[project]
-languages = ["Python", "JavaScript"]
-frameworks = ["FastAPI", "React"]
-build_system = "poetry"
+[structure]
+source = "src/"
+modules = "src/modules/"
+tests = "tests/"
+config = "config/"
 
-[[module]]
-name = "auth"
-location = "src/modules/auth/"
-description = "User authentication and session management"
-file = "ai_project_index/modules/auth.toml"
+[modules]
+auth = "modules/auth.toml"
+api = "modules/api.toml"
+database = "modules/database.toml"
 
-[[module]]
-name = "api"
-location = "src/api/"
-description = "REST API endpoints and routes"
-file = "ai_project_index/modules/api.toml"
+[entry_points]
+main = "src/main.py"
+config = "config/settings.py"
+
+[commands]
+dev = "uvicorn src.main:app --reload"
+test = "pytest -x"
+lint = "ruff check src/"
+
+[context_loading]
+on_bug_fix = [
+    "ai_project_index/modules/{affected_module}.toml",
+    "tests/",
+]
+on_new_feature = [
+    "ai_project_index/ai_project_index.toml",
+    "docs/architecture.md",
+]
+on_refactor = [
+    "ai_project_index/ai_project_index.toml",
+    "ai_project_index/modules/",
+]
+always_read = [
+    "ai_project_index/ai_project_index.toml",
+]
+
+[boundaries]
+invariants = [
+    "Database access ONLY through repository layer",
+    "All external API calls go through src/clients/",
+]
+protected_files = [
+    "migrations/ — Never auto-generate; user handles migrations",
+]
+
+[testing]
+framework = "pytest"
+run_command = "pytest -x"
+conventions = [
+    "Use fixtures from conftest.py",
+    "Mock external services in tests",
+]
+
+[dependencies.external]
+"fastapi" = "Web framework"
+"sqlalchemy" = "ORM"
+"pydantic" = "Data validation"
 ```
 
 ### Sample Module File `modules/auth.toml`
@@ -219,6 +272,51 @@ roots = ["src", "lib", "scripts"]
 
 ## Key Concepts
 
+### Context Loading
+
+The `[context_loading]` section is a **routing table** for AI context. Instead of loading the entire index for every task, AI reads this section first to determine which files are relevant:
+
+```toml
+[context_loading]
+on_bug_fix = ["ai_project_index/modules/{affected_module}.toml", "tests/"]
+on_new_feature = ["ai_project_index/ai_project_index.toml", "docs/architecture.md"]
+on_refactor = ["ai_project_index/ai_project_index.toml", "ai_project_index/modules/"]
+always_read = ["ai_project_index/ai_project_index.toml"]
+```
+
+This is the single most impactful section for reducing ongoing token usage — it prevents AI from reading the entire codebase for every interaction.
+
+### Architectural Boundaries
+
+The `[boundaries]` section documents constraints that AI must not violate:
+
+```toml
+[boundaries]
+invariants = [
+    "Database access ONLY through repository layer",
+    "All external API calls go through src/clients/",
+]
+protected_files = [
+    "migrations/ — Never auto-generate",
+]
+```
+
+This prevents AI agents from making structurally harmful changes, even when they have the technical ability to do so.
+
+### Testing Strategy
+
+The `[testing]` section helps AI write tests that match your project's patterns:
+
+```toml
+[testing]
+framework = "pytest"
+run_command = "pytest -x"
+conventions = [
+    "Use fixtures from conftest.py",
+    "Mock external services in tests",
+]
+```
+
 ### The [meta] Section
 
 Every TOML file starts with metadata:
@@ -269,6 +367,29 @@ modules = ["src/modules/users/models.py"]
 external = ["requests", "pydantic"]
 ```
 
+## Integration with AI Tools
+
+**ai_project_index** works with any AI coding assistant. Here's how to integrate with popular tools:
+
+### Claude Code
+Add to your `CLAUDE.md`:
+```markdown
+## Project Index
+Read `ai_project_index/ai_project_index.toml` first. Use `[context_loading]` to determine relevant files. Respect `[boundaries]`.
+```
+
+### Cursor
+Add a `.cursor/rules/` rule or reference the index in your project rules. Cursor agents will automatically read referenced files.
+
+### GitHub Copilot
+Add to `.github/copilot-instructions.md`:
+```markdown
+Read ai_project_index/ai_project_index.toml for project structure. Module details are in ai_project_index/modules/.
+```
+
+### Other Tools (Windsurf, Cline, Aider, etc.)
+Most AI coding tools support instruction files. Add the index reference to whichever instruction mechanism your tool uses.
+
 ## Maintenance
 
 ### Updating the Index
@@ -317,6 +438,7 @@ To save future tokens:
 - Avoid documenting implementation details that change frequently
 - Focus on architectural boundaries and public interfaces
 - Review and prune unnecessary entries periodically
+- Module TOML files should be **10–40 lines** each — split or merge if outside this range
 
 ## Best Practices
 
@@ -335,6 +457,11 @@ To save future tokens:
 - Highlight public APIs and interfaces
 - Skip private implementation details
 - Think in layers: Core → Modules → Features
+
+### Optimize for Context Routing
+- Fill in `[context_loading]` to minimize per-task token usage
+- Document `[boundaries]` to prevent structural mistakes
+- Keep descriptions concise — every line costs tokens in every future session
 
 ### Treat as Living Documentation
 - Update alongside code changes (see [Maintenance](#maintenance))
@@ -379,6 +506,7 @@ bash /tmp/ai_project_index/activate.sh
 - Document file purposes, not every function
 - Group similar components (e.g., all models together, not individually)
 - Split large modules into smaller sub-modules
+- Target 10–40 lines per module file
 
 ### AI still reads too many files
 
@@ -390,6 +518,7 @@ bash /tmp/ai_project_index/activate.sh
    **Important** Read:
      - Project index: `ai_project_index/ai_project_index.toml`
      - Modules: `ai_project_index/modules/*.toml`
+   Use [context_loading] to route to relevant files.
    ```
 
 2. Remind the AI explicitly: "Use the project index in ai_project_index/ instead of reading files directly"
@@ -417,6 +546,7 @@ bash /tmp/ai_project_index/activate.sh
 - **Structured** — Supports nested sections and arrays
 - **Comments** — Include explanatory notes
 - **Universal** — Parsers available in all languages
+- **Token-efficient** — Less syntactic overhead than JSON or YAML
 
 ## Credits
 
@@ -426,6 +556,9 @@ This project builds upon the snapshot concept introduced in [小海嚴寫 Vibe C
 - Formalized TOML structure for better parsing
 - Multi-module organization for larger codebases
 - Cross-reference tracking for dependencies
+- Context routing via `[context_loading]` for task-specific context loading
+- Architectural boundaries via `[boundaries]` for AI guardrails
+- Testing conventions via `[testing]` for consistent test generation
 - Language-agnostic approach
 
 ## License

@@ -9,17 +9,28 @@ alwaysApply: false
 ## Placeholders
 
 - Format: `{{PLACEHOLDER_NAME}}` — double curly braces, UPPER_SNAKE_CASE.
-- Current placeholders: `{{PROJECT_NAME}}`, `{{ROOT_FOLDERS}}`.
+- Current placeholders: `{{PROJECT_NAME}}`, `{{ROOT_FOLDERS}}`, `{{MODULE_NAME}}`.
 - All placeholders must be replaceable by `sed` in `activate.sh`. Avoid characters that conflict with sed delimiters (`|`).
 
 ## ai_project_index.toml
 
-- Sections: `[meta]`, `[structure]`, `[modules]`, `[entry_points]`, `[commands]`, `[dependencies.policy]`, `[dependencies.external]`, `[conventions]`, `[conventions.patterns]`, `[conventions.files]`, `[notes]`.
+- Sections: `[meta]`, `[structure]`, `[modules]`, `[entry_points]`, `[commands]`, `[context_loading]`, `[boundaries]`, `[dependencies.policy]`, `[dependencies.external]`, `[testing]`, `[conventions]`, `[conventions.patterns]`, `[conventions.files]`, `[notes]`.
 - Use TOML comments (`#`) for examples and guidance — users and AI fill in values.
 - `[[component]]` arrays are for inline component definitions; larger projects use separate module files.
+- `[context_loading]` maps task types to relevant files (routing table for AI context).
+- `[boundaries]` documents architectural invariants AI must not violate.
+- `[testing]` describes test framework, conventions, and commands.
+
+## module.toml
+
+- Per-module template with `[meta]`, `[[component]]` arrays, `[dependencies]`, and `[usage]` sections.
+- Uses `{{MODULE_NAME}}` and `{{PROJECT_NAME}}` placeholders.
+- Target size: 10–40 lines per module file.
 
 ## INIT.md
 
 - Step-by-step AI analysis instructions — maintain the numbered step structure.
 - Must be self-contained: an AI reading only this file should understand the full workflow.
 - References `ai_project_index/ai_project_index.toml` and `ai_project_index/modules/` as output targets.
+- Emphasizes context budget awareness: every line costs future tokens.
+- Instructs AI to delete INIT.md when analysis is complete.

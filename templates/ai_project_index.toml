@@ -46,6 +46,60 @@ scripts = ""               # Build/utility scripts
 # format = ""              # Format code
 # deploy = ""              # Deploy command
 
+# ──────────────────────────────────────────────
+# Context Loading — Guide AI to the right files
+# ──────────────────────────────────────────────
+
+[context_loading]
+# Help AI agents load ONLY relevant context for a given task.
+# Think of this as a "routing table": task type → files to read.
+#
+# Example:
+# [context_loading]
+# on_bug_fix = [
+#     "ai_project_index/modules/{affected_module}.toml",
+#     "tests/",
+# ]
+# on_new_feature = [
+#     "ai_project_index/ai_project_index.toml",
+#     "ai_project_index/modules/{related_module}.toml",
+#     "docs/architecture.md",
+# ]
+# on_refactor = [
+#     "ai_project_index/ai_project_index.toml",
+#     "ai_project_index/modules/",  # Read all module indices
+# ]
+# on_test_writing = [
+#     "tests/conftest.py",
+#     "tests/fixtures/",
+# ]
+# always_read = [
+#     "ai_project_index/ai_project_index.toml",
+# ]
+
+# ──────────────────────────────────────────────
+# Boundaries — What AI must NOT change or violate
+# ──────────────────────────────────────────────
+
+[boundaries]
+# Architectural invariants the AI must respect.
+# These are constraints that apply regardless of the task.
+#
+# Example:
+# invariants = [
+#     "Database access ONLY through repository layer",
+#     "All external API calls go through src/clients/",
+#     "Never import from internal modules across domain boundaries",
+# ]
+# protected_files = [
+#     "src/core/config.py — Do not modify without explicit request",
+#     "migrations/ — Never auto-generate; user handles migrations",
+# ]
+# protected_patterns = [
+#     "Do not change public API signatures without discussion",
+#     "Do not remove or rename exported types",
+# ]
+
 [dependencies.policy]
 # Architectural rules for dependencies
 allowed = [
@@ -66,13 +120,35 @@ forbidden = [
 # "react" = "UI framework"
 # "express" = "Web server"
 
+# ──────────────────────────────────────────────
+# Testing — Help AI write correct tests
+# ──────────────────────────────────────────────
+
+[testing]
+# How tests are organized and run in this project.
+#
+# Example:
+# framework = "pytest"         # or jest, vitest, go test, etc.
+# run_command = "pytest -x"    # Command to run all tests
+# structure = "co-located"     # or "separate" (tests/ folder) or "co-located" (__tests__/ next to source)
+# conventions = [
+#     "Use fixtures from conftest.py, not inline setup",
+#     "Mock external services, never hit real APIs in tests",
+#     "Each module has its own test file",
+#     "Name test files: test_{module}.py",
+# ]
+# coverage_command = ""        # e.g., "pytest --cov=src"
+
+# ──────────────────────────────────────────────
+# Conventions — Patterns AI should follow
+# ──────────────────────────────────────────────
+
 [conventions]
 # Project-specific patterns and rules for AI to follow
 #
 # naming = "snake_case for functions, PascalCase for classes"
 # imports = "absolute imports only"
 # error_handling = "use Result type, avoid exceptions for flow control"
-# testing = "co-located tests in __tests__/ folders"
 
 [conventions.patterns]
 # Example patterns AI should follow:
@@ -86,6 +162,10 @@ forbidden = [
 # service = "*.service.ts"
 # test = "*.test.ts"
 # model = "*_model.py"
+
+# ──────────────────────────────────────────────
+# Inline components (for smaller projects)
+# ──────────────────────────────────────────────
 
 # [[component]]
 # For larger projects, move this to modules/core.toml
@@ -109,4 +189,4 @@ forbidden = [
 # Important information that doesn't fit elsewhere:
 # "This project is in migration from X to Y"
 # "Legacy code in old/ should not be modified"
-# "Performance is critical - avoid N+1 queries"
+# "Performance is critical — avoid N+1 queries"

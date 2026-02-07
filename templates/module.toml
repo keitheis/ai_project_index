@@ -1,0 +1,31 @@
+# Module: {{MODULE_NAME}}
+# Part of: {{PROJECT_NAME}}
+
+[meta]
+name = "{{MODULE_NAME}}"
+location = ""              # e.g., src/modules/auth/
+description = ""           # One sentence: what this module does
+
+# Document key components using appropriate types:
+# [[model]], [[service]], [[repository]], [[controller]],
+# [[handler]], [[component]], [[utility]], [[middleware]], [[config]]
+
+# [[model]]
+# name = ""
+# file = ""
+# purpose = ""
+# exports = []
+
+# [[service]]
+# name = ""
+# file = ""
+# purpose = ""
+# exports = []
+
+[dependencies]
+# core = []               # Shared utilities used by this module
+# modules = []            # Other modules this depends on
+# external = []           # Third-party libraries
+
+[usage]
+# imported_by = []        # Files that import from this module

@@ -7,7 +7,7 @@ set -e  # Exit on error
 set -u  # Exit on undefined variable
 
 # CONSTANTS & CONFIGURATION
-VERSION="1.0.0"
+VERSION="1.1.0"
 GITHUB_RAW_BASE="https://raw.githubusercontent.com/keitheis/ai_project_index/main"
 
 # Colors for output
@@ -72,6 +72,12 @@ download_template() {
 # MAIN LOGIC
 
 main() {
+    # Handle --version flag
+    if [ "${1:-}" = "--version" ] || [ "${1:-}" = "-v" ]; then
+        echo "ai_project_index v$VERSION"
+        exit 0
+    fi
+
     print_header
 
     # Determine execution mode and target directory
@@ -230,6 +236,25 @@ main() {
 
     print_success "Created: INIT.md"
 
+    # Generate module.toml template
+    print_info "Creating module template..."
+
+    if [ "$USE_REMOTE" = true ]; then
+        download_template "module.toml" | \
+            sed "s|{{PROJECT_NAME}}|$PROJECT_NAME|g" \
+            > "$MODULES_DIR/_template.toml"
+    else
+        MODULE_TEMPLATE="$SCRIPT_DIR/templates/module.toml"
+        if [ ! -f "$MODULE_TEMPLATE" ]; then
+            print_warning "Module template not found, skipping: $MODULE_TEMPLATE"
+        else
+            sed "s|{{PROJECT_NAME}}|$PROJECT_NAME|g" "$MODULE_TEMPLATE" \
+                > "$MODULES_DIR/_template.toml"
+        fi
+    fi
+
+    print_success "Created: modules/_template.toml"
+
     # Success message
     echo ""
     print_header
@@ -239,26 +264,29 @@ main() {
     echo "  📁 $INDEX_DIR/modules/"
     echo "  📄 $INDEX_DIR/ai_project_index.toml"
     echo "  📄 $INDEX_DIR/INIT.md"
+    echo "  📄 $INDEX_DIR/modules/_template.toml"
     echo ""
     echo -e "${YELLOW}Next steps:${NC}"
-    echo "  1. Open your AI IDE/CLI"
+    echo "  1. Open your AI IDE/CLI (Claude Code, Cursor, Copilot, etc.)"
     echo "  2. Copy this prompt and paste it to AI dialog:"
     echo ""
-    echo -e "${BLUE}     1. Read ai_project_index/INIT.md"
-    echo "     2. Use snapshot concept to analyze this project"
-    echo "     3. Update ai_project_index/ai_project_index.toml and create module files."
-    echo "        Remove unused sections and comments to keep toml files small."
-    echo -e "     4. Delete ai_project_index/INIT.md in the end. ${NC}"
+    echo -e "${BLUE}     1. Read ai_project_index/INIT.md and follow the instructions."
+    echo "     2. Analyze this project and fill in ai_project_index/ai_project_index.toml."
+    echo "     3. Create module files in ai_project_index/modules/."
+    echo "     4. Fill in [context_loading] and [boundaries] sections."
+    echo "     5. Remove unused sections, comments, and template examples."
+    echo -e "     6. Delete ai_project_index/INIT.md when done.${NC}"
     echo ""
-    echo "  3. Add to your AI instructions (e.g., CLAUDE.md):"
+    echo "  3. Add to your AI instructions (CLAUDE.md, AGENTS.md, copilot-instructions.md, etc.):"
     echo ""
     echo -e "${BLUE}     ## Architecture/Modules/Project Index"
     echo ""
     echo "     **Read first:**"
-    echo "     - \`ai_project_index/ai_project_index.toml\` (project overview)"
+    echo "     - \`ai_project_index/ai_project_index.toml\` (project overview and context routing)"
     echo "     - Relevant \`ai_project_index/modules/*.toml\` files (module details)"
     echo ""
-    echo -e "     Use the index to navigate the codebase efficiently.${NC}"
+    echo "     Use [context_loading] to determine relevant files for the current task."
+    echo -e "     Respect [boundaries] — do not violate architectural invariants.${NC}"
     echo ""
 }
 
