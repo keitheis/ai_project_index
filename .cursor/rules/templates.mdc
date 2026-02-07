@@ -1,0 +1,25 @@
+---
+description: templates/ 目錄中模板檔案的慣例
+globs: templates/**
+alwaysApply: false
+---
+
+# Template Conventions
+
+## Placeholders
+
+- Format: `{{PLACEHOLDER_NAME}}` — double curly braces, UPPER_SNAKE_CASE.
+- Current placeholders: `{{PROJECT_NAME}}`, `{{ROOT_FOLDERS}}`.
+- All placeholders must be replaceable by `sed` in `activate.sh`. Avoid characters that conflict with sed delimiters (`|`).
+
+## ai_project_index.toml
+
+- Sections: `[meta]`, `[structure]`, `[modules]`, `[entry_points]`, `[commands]`, `[dependencies.policy]`, `[dependencies.external]`, `[conventions]`, `[conventions.patterns]`, `[conventions.files]`, `[notes]`.
+- Use TOML comments (`#`) for examples and guidance — users and AI fill in values.
+- `[[component]]` arrays are for inline component definitions; larger projects use separate module files.
+
+## INIT.md
+
+- Step-by-step AI analysis instructions — maintain the numbered step structure.
+- Must be self-contained: an AI reading only this file should understand the full workflow.
+- References `ai_project_index/ai_project_index.toml` and `ai_project_index/modules/` as output targets.

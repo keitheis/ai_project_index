@@ -1,0 +1,17 @@
+---
+description: activate.sh shell script 開發慣例
+globs: activate.sh
+alwaysApply: false
+---
+
+# Shell Script Conventions
+
+- Use `bash` with `set -e` (exit on error) and `set -u` (exit on undefined variable).
+- `sed` commands must be cross-platform compatible — use `sed "s|pattern|replacement|g"` with pipe delimiters. Avoid GNU-only flags; BSD sed (macOS) is the baseline.
+- Maintain the existing color output helpers: `print_success`, `print_warning`, `print_error`, `print_info`, and `error_exit`.
+- The script has two execution modes determined by `USE_REMOTE`:
+  - **Remote** (`curl | bash`): downloads templates via `download_template()` from GitHub raw URLs.
+  - **Local** (cloned repo): reads templates from `$SCRIPT_DIR/templates/`.
+  Both paths must remain functional after any change.
+- When reading user input in piped mode, always read from `/dev/tty` (e.g., `read response </dev/tty`).
+- Version is tracked in the `VERSION` variable at the top of the file.
