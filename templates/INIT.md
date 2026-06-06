@@ -7,6 +7,23 @@ Welcome! This file guides you through analyzing this codebase and creating a str
 Create a **split snapshot** system using TOML files to document this codebase efficiently.
 This reduces token usage by allowing AI assistants to read only relevant parts of the architecture.
 
+## Guiding Principle: Navigation, not behavior
+
+The index answers **what a module does** and **where each concern lives** — never
+**how** the code works step by step. The source code is the single source of
+truth for HOW.
+
+A good entry survives refactors. Before writing any note, apply this litmus test:
+
+> "Would a refactor that doesn't change the architecture force me to edit this?"
+
+If yes, it's too low-level — don't transcribe the steps. Instead **point to the
+file/module that owns the behavior** (and, if detail is genuinely needed, a
+co-located `CLAUDE.md` next to that code). Keep only durable, non-obvious
+constraints: external gotchas, invariants, forbidden dependencies.
+
+Prefer **pointers over recipes**. Recipes rot when the code changes; pointers don't.
+
 ## Analysis Roots
 
 Analyze starting from: **{{ROOT_FOLDERS}}**
@@ -124,6 +141,7 @@ When documenting, ask yourself:
 
 **Exclude:**
 - Implementation details (AI can read the source)
+- Step-by-step recipes or call sequences (they rot when the code changes — point to the owning file instead)
 - Frequently changing data
 - Obvious information
 

@@ -30,3 +30,15 @@ This is a small, self-contained project with no build system or tests:
 - The TOML format uses `[meta]`, `[[component]]` arrays, `[dependencies]`, and `[usage]` sections
 - Module TOML files go in `ai_project_index/modules/{module_name}.toml`
 - The framework is language-agnostic — component types (`[[model]]`, `[[service]]`, etc.) adapt to the target project
+
+## Design Principle: Navigation, not behavior
+
+The index — and everything the templates teach users to write — must stay
+**navigational**: *what* a module does and *where* each concern lives. The code
+is the single source of truth for *how*. Step-by-step behavioral recipes rot as
+code changes; pointers to the owning file/module don't.
+
+When editing `templates/INIT.md` or `templates/ai_project_index.toml`, preserve
+this: keep the litmus test ("would a refactor that doesn't change the
+architecture force an edit?") and the "pointers over recipes" guidance, and
+don't reintroduce example notes that encode implementation steps.

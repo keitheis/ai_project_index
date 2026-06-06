@@ -312,9 +312,16 @@ Update the index when:
 
 ### Keeping It Lean
 
+The index is **navigation, not behavior**: it captures *what* a module does and
+*where* each concern lives — the code stays the source of truth for *how*.
+
 To save future tokens:
 - Remove outdated or deleted modules from TOML files
 - Avoid documenting implementation details that change frequently
+- Prefer **pointers over recipes**: name the files/modules that own a concern
+  instead of transcribing step-by-step call sequences (recipes rot, pointers don't)
+- When you find a stale note, convert the recipe into a pointer rather than
+  re-syncing the steps
 - Focus on architectural boundaries and public interfaces
 - Review and prune unnecessary entries periodically
 
@@ -334,6 +341,7 @@ To save future tokens:
 - Document boundaries between modules
 - Highlight public APIs and interfaces
 - Skip private implementation details
+- Litmus test: if a refactor that doesn't change the architecture would force an edit here, it's too low-level — point to the file instead
 - Think in layers: Core → Modules → Features
 
 ### Treat as Living Documentation
