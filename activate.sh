@@ -258,7 +258,13 @@ main() {
     echo "     - \`ai_project_index/ai_project_index.toml\` (project overview)"
     echo "     - Relevant \`ai_project_index/modules/*.toml\` files (module details)"
     echo ""
-    echo -e "     Use the index to navigate the codebase efficiently.${NC}"
+    echo "     Use the index to navigate the codebase efficiently."
+    echo ""
+    echo "     Update \`ai_project_index/\` when adding, updating, or removing"
+    echo "     classes or modules, if needed — by this principle: the index is"
+    echo "     NAVIGATION (what a module does, where a concern lives, durable"
+    echo "     cross-file constraints) — not a place for code notes (mechanics,"
+    echo -e "     maths, tuning values, rationale, recipes).${NC}"
     echo ""
 }
 

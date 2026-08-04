@@ -149,7 +149,8 @@ When documenting, ask yourself:
 
 1. **Start small** - Document high-level structure first, add details iteratively
 2. **Be consistent** - Use similar structure for similar modules
-3. **Keep it current** - Update when architecture changes
+3. **Keep it current** - Update `ai_project_index/` when adding, updating, or
+   removing classes or modules, if needed (see Guiding Principle above)
 4. **Be concise** - Prioritize clarity over completeness
 5. **Think in layers** - Core → Modules → Features
 
